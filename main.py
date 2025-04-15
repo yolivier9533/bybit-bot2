@@ -3,9 +3,9 @@ import time
 import hmac
 import hashlib
 
-# === Nom du bot : BotAutoTP ===
-API_KEY = "pUAz2TgcVBj3ZKc73z"
-API_SECRET = "Bq2YFHSROE8WNz9znRDAkm8c8iuC64g0AaTk"
+# === Nom du bot : BotAutoTP_2 ===
+API_KEY = "E8IThfO6exaGniMZPM"
+API_SECRET = "fdlqKs72Xsc8Bu4wZZshLVZML8Qn7PASMi6s"
 BASE_URL = "https://api.bybit.com"
 
 def generate_signature(params, secret):
@@ -39,8 +39,7 @@ def get_wallet_balance():
 
     final_url = f"{url}?{query_string}&sign={signature}"
 
-    # 🔍 Affichage debug complet
-    print("🤖 Bot : BotAutoTP")
+    print("🤖 Bot : BotAutoTP_2")
     print("🔍 URL signée :", final_url)
     print("🔍 Headers :", headers)
 
