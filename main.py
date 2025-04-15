@@ -3,10 +3,10 @@ import time
 import hmac
 import hashlib
 
-# Nom du bot : BotAutoTP-Bitget
+# Bitget API keys
 API_KEY = "bg_2f8ab665057c20f46e514e4e6415e105"
 API_SECRET = "66518bd5ac20fcc95e58ea2f4d2daefef0f57a5bc7eae26d9258330780b5a179"
-PASS_PHRASE = "grouchym"  # Passphrase si nécessaire
+PASS_PHRASE = "grouchym"
 BASE_URL = "https://api.bitget.com"
 
 # Fonction pour générer la signature
@@ -19,9 +19,9 @@ def generate_signature(params, secret):
         hashlib.sha256
     ).hexdigest()
 
-# Fonction pour récupérer les ordres ouverts
-def get_open_orders():
-    endpoint = "/api/v1/order/open"  # Pour voir les ordres ouverts
+# Fonction pour récupérer le solde (ou d'autres infos)
+def get_wallet_info():
+    endpoint = "/api/v1/account/asset"  # Endpoint pour les infos sur les actifs
     url = BASE_URL + endpoint
 
     timestamp = str(int(time.time() * 1000))
@@ -47,5 +47,5 @@ def get_open_orders():
     return response.text
 
 print("🔄 Connexion à Bitget...")
-result = get_open_orders()
+result = get_wallet_info()
 print("📊 Résultat brut :", result)
