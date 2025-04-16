@@ -1,8 +1,8 @@
 import time
-import hashlib
 import hmac
-import requests
+import hashlib
 import base64
+import requests
 
 # Ton API Key, Secret Key, et Passphrase
 api_key = 'bg_efce6c9c994335ade6edcb632cdc43d3'
@@ -24,13 +24,11 @@ def generate_signature(timestamp, method, request_path, body=''):
 
 # Fonction pour vérifier la position ouverte
 def check_open_position():
-    url = "https://api.bitget.com/api/v2/mix/position"  # Utilisation de l'endpoint V2
+    url = "https://api.bitget.com"  # Base URL
+    request_path = "/api/v2/mix/position"  # Utilisation de l'endpoint V2 pour récupérer les positions
 
     timestamp = get_timestamp()
-    method = "GET"
-    request_path = "/api/v2/mix/position"
-
-    # Générer la signature
+    method = "GET"  # Méthode GET pour récupérer les positions
     signature = generate_signature(timestamp, method, request_path)
 
     headers = {
@@ -42,7 +40,7 @@ def check_open_position():
     }
 
     # Effectuer la requête GET
-    response = requests.get(url + request_path, headers=headers)
+    response = requests.get(f"{url}{request_path}", headers=headers)
 
     if response.status_code == 200:
         print("Position ouverte trouvée ! Voici les détails : ", response.json())
@@ -52,3 +50,4 @@ def check_open_position():
 
 # Tester la fonction
 check_open_position()
+
