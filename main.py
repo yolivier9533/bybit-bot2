@@ -4,10 +4,10 @@ import hashlib
 import base64
 import requests
 
-# Ton API Key, Secret Key, et Passphrase
-api_key = 'bg_efce6c9c994335ade6edcb632cdc43d3'
-api_secret = '513c544ad212d7a002549769f42cee2bda5baa11fb41dc520cdf22e8989cdad6'
-passphrase = 'grouchym'
+# API Key, Secret Key et Passphrase
+API_KEY = 'bg_efce6c9c994335ade6edcb632cdc43d3'
+SECRET_KEY = '513c544ad212d7a002549769f42cee2bda5baa11fb41dc520cdf22e8989cdad6'
+PASSPHRASE = 'grouchym'
 
 # Fonction pour obtenir le timestamp en millisecondes
 def get_timestamp():
@@ -15,39 +15,34 @@ def get_timestamp():
 
 # Fonction pour générer la signature
 def generate_signature(timestamp, method, request_path, body=''):
-    query_string = ''
-    if body:
-        body = str(body)
-    payload = f"{timestamp}{method.upper()}{request_path}{query_string}{body}"
-    signature = hmac.new(api_secret.encode(), payload.encode(), hashlib.sha256).hexdigest()
-    return signature
+    payload = f"{timestamp}{method.upper()}{request_path}{body}"
+    return hmac.new(SECRET_KEY.encode(), payload.encode(), hashlib.sha256).hexdigest()
 
-# Fonction pour vérifier la position ouverte
+# Fonction pour vérifier si une position est ouverte
 def check_open_position():
     url = "https://api.bitget.com"  # Base URL
-    request_path = "/api/v2/mix/position"  # Utilisation de l'endpoint V2 pour récupérer les positions
+    request_path = "/api/v2/mix/position"  # Endpoint V2 pour vérifier les positions ouvertes
 
     timestamp = get_timestamp()
-    method = "GET"  # Méthode GET pour récupérer les positions
+    method = "GET"  # Méthode GET
     signature = generate_signature(timestamp, method, request_path)
 
     headers = {
-        'ACCESS-KEY': api_key,
+        'ACCESS-KEY': API_KEY,
         'ACCESS-SIGN': signature,
         'ACCESS-TIMESTAMP': timestamp,
-        'ACCESS-PASSPHRASE': passphrase,
+        'ACCESS-PASSPHRASE': PASSPHRASE,
         'Content-Type': 'application/json'
     }
 
-    # Effectuer la requête GET
+    # Effectuer la requête
     response = requests.get(f"{url}{request_path}", headers=headers)
 
-    if response.status_code == 200:
-        print("Position ouverte trouvée ! Voici les détails : ", response.json())
-    else:
-        print("Erreur : ", response.status_code)
-        print("Message d'erreur : ", response.text)
+    # Afficher la réponse
+    print("HTTP Status Code:", response.status_code)
+    print("Response Text:", response.text)
 
-# Tester la fonction
+# Test de la fonction
 check_open_position()
+
 
