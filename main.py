@@ -22,7 +22,7 @@ def generate_signature(api_key, api_secret, params):
 
 # ===== TEST : Vérifier les positions ouvertes =====
 def check_open_position():
-    endpoint = "/api/futures/v1/position"  # endpoint pour récupérer les positions futures
+    endpoint = "/api/mix/v1/position"  # endpoint corrigé pour récupérer les positions futures
     url = BASE_URL + endpoint
 
     timestamp = str(int(time.time() * 1000))
@@ -45,7 +45,11 @@ def check_open_position():
 
     response = requests.get(url, params=params, headers=headers)
     print("HTTP Status Code:", response.status_code)
-    print("Response:", response.json())
+    try:
+        print("Response:", response.json())
+    except ValueError:
+        print("Error: Unable to decode JSON response.")
+        print("Response text:", response.text)
 
 # ===== LANCEMENT =====
 print("🔄 Vérification de la position sur Bitget...")
