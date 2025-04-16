@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: bybit-bot2
+    name: bitgetbotyo
     env: python
     plan: free
     buildCommand: ""
