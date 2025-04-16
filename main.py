@@ -1,56 +1,53 @@
-import requests
 import time
 import hmac
 import hashlib
+import base64
+import requests
+import json
 
-# ====== CONFIGURATION ======
-API_KEY = "bg_efce6c9c994335ade6edcb632cdc43d3"
-API_SECRET = "513c544ad212d7a002549769f42cee2bda5baa11fb41dc520cdf22e8989cdad6"
-PASS_PHRASE = "grouchym"
-BASE_URL = "https://api.bitget.com"
+# Paramètres API
+API_KEY = 'bg_efce6c9c994335ade6edcb632cdc43d3'  # Remplace avec ta clé API
+SECRET_KEY = '513c544ad212d7a002549769f42cee2bda5baa11fb41dc520cdf22e8989cdad6'  # Remplace avec ton Secret Key
+PASSPHRASE = 'grouchym'  # Remplace avec ta passphrase
 
-# ===== SIGNATURE =====
-def generate_signature(api_key, api_secret, params):
-    sorted_params = sorted(params.items())
-    query_string = "&".join([f"{k}={v}" for k, v in sorted_params])
-    sign = hmac.new(
-        bytes(api_secret, 'utf-8'),
-        bytes(query_string, 'utf-8'),
-        hashlib.sha256
-    ).hexdigest()
-    return sign
+# URL de l'API
+API_URL = "https://api.bitget.com"
 
-# ===== TEST : Vérifier les positions ouvertes =====
+# Fonction pour générer la signature
+def generate_signature(timestamp, method, request_path, body=""):
+    signature_content = f"{timestamp}{method}{request_path}{body}"
+    signature = hmac.new(SECRET_KEY.encode(), signature_content.encode(), hashlib.sha256).digest()
+    return base64.b64encode(signature).decode()
+
+# Fonction pour vérifier s'il y a un trade en cours
 def check_open_position():
-    endpoint = "/api/mix/v1/position"  # endpoint corrigé pour récupérer les positions futures
-    url = BASE_URL + endpoint
-
+    # Récupérer le timestamp actuel
     timestamp = str(int(time.time() * 1000))
-    params = {
-        "apiKey": API_KEY,
-        "timestamp": timestamp,
-        "passphrase": PASS_PHRASE
-    }
 
+    # Chemin de l'API pour vérifier les positions en cours
+    request_path = "/api/v2/mix/position"
+    method = "GET"
+    
     # Générer la signature
-    sign = generate_signature(API_KEY, API_SECRET, params)
-    params["sign"] = sign
+    signature = generate_signature(timestamp, method, request_path)
 
+    # En-têtes HTTP nécessaires
     headers = {
-        "X-BYBIT-API-KEY": API_KEY,
-        "X-BYBIT-API-SIGN": sign,
-        "X-BYBIT-API-TIMESTAMP": timestamp,
-        "Content-Type": "application/json"
+        'ACCESS-KEY': API_KEY,
+        'ACCESS-SIGN': signature,
+        'ACCESS-TIMESTAMP': timestamp,
+        'ACCESS-PASSPHRASE': PASSPHRASE,
+        'Content-Type': 'application/json'
     }
 
-    response = requests.get(url, params=params, headers=headers)
-    print("HTTP Status Code:", response.status_code)
-    try:
-        print("Response:", response.json())
-    except ValueError:
-        print("Error: Unable to decode JSON response.")
-        print("Response text:", response.text)
+    # Faire la requête
+    response = requests.get(f"{API_URL}{request_path}", headers=headers)
+    
+    # Vérification du code de réponse
+    if response.status_code == 200:
+        print("Trade en cours :", response.json())
+    else:
+        print("Erreur :", response.status_code, response.text)
 
-# ===== LANCEMENT =====
-print("🔄 Vérification de la position sur Bitget...")
+# Appeler la fonction pour vérifier les positions
 check_open_position()
